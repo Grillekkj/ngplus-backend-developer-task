@@ -21,7 +21,7 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "migration:run": "npm run typeorm migration:run -- -d src/common/configs/typeorm.ts",
     "migration:generate": "ts-node -r tsconfig-paths/register src/infra/database/scripts/db-migration-generate.ts",
-    "migration:revert": "npm run typeorm -- -d src/configs/typeorm.ts migration:revert",
+    "migration:revert": "npm run typeorm -- -d src/common/configs/typeorm.ts migration:revert",
     "seed:create": "ts-node -r tsconfig-paths/register src/infra/database/scripts/db-seed-create.ts",
     "seed:run": "ts-node -r tsconfig-paths/register src/infra/database/scripts/db-seed-run.ts"
   },
