@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 const env = process.env;
 
-export const enviroment = {
+export const environment = {
   databaseConfigs: {
     type: env.DATABASE_TYPE,
     user: env.DATABASE_USER,
