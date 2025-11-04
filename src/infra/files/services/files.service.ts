@@ -151,7 +151,10 @@ export class FilesService implements OnModuleInit {
 
   async deleteFile(fileUrl: string): Promise<boolean> {
     try {
-      if (!fileUrl.startsWith(`${this.publicUrlBase}/${this.bucketName}/`)) {
+      const cleanPublicBase = this.publicUrlBase.replace(/\/$/, '');
+      const expectedPrefix = `${cleanPublicBase}/${this.bucketName}/`;
+
+      if (!fileUrl.startsWith(expectedPrefix)) {
         this.logger.error(
           `Invalid file URL or does not belong to the configured bucket: ${fileUrl}`,
         );
