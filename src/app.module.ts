@@ -4,8 +4,9 @@ import { DataSourceOptions } from 'typeorm';
 import { Module } from '@nestjs/common';
 
 import { enviroment } from './common/configs/enviroment';
-const isDocker = process.env.DOCKER === 'true';
+import { FilesModule } from './infra/files/files.module';
 
+const isDocker = process.env.DOCKER === 'true';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,6 +24,7 @@ const isDocker = process.env.DOCKER === 'true';
       synchronize: false,
       logging: true,
     } as DataSourceOptions),
+    FilesModule,
   ],
 })
 export class AppModule {}
