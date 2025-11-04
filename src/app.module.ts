@@ -1,10 +1,28 @@
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { DataSourceOptions } from 'typeorm';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
+import { enviroment } from './common/configs/enviroment';
+const isDocker = process.env.DOCKER === 'true';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    TypeOrmModule.forRoot({
+      type: enviroment.databaseConfigs.type,
+      host: isDocker ? 'postgres_db' : enviroment.databaseConfigs.host,
+      port: isDocker ? 5432 : enviroment.databaseConfigs.port,
+      password: enviroment.databaseConfigs.password,
+      username: enviroment.databaseConfigs.user,
+      autoLoadEntities: true,
+      database: enviroment.databaseConfigs.name,
+      synchronize: false,
+      logging: true,
+    } as DataSourceOptions),
+  ],
 })
 export class AppModule {}
