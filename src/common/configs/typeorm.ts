@@ -1,17 +1,17 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { registerAs } from '@nestjs/config';
 
-import { enviroment } from './enviroment';
+import { environment } from './environment';
 
 const isDocker = process.env.DOCKER === 'true';
 
 const databaseConfig = {
-  type: enviroment.databaseConfigs.type,
-  host: isDocker ? 'postgres_db' : enviroment.databaseConfigs.host,
-  port: isDocker ? 5432 : enviroment.databaseConfigs.port,
-  username: enviroment.databaseConfigs.user,
-  password: enviroment.databaseConfigs.password,
-  database: enviroment.databaseConfigs.name,
+  type: environment.databaseConfigs.type,
+  host: isDocker ? 'postgres_db' : environment.databaseConfigs.host,
+  port: isDocker ? 5432 : environment.databaseConfigs.port,
+  username: environment.databaseConfigs.user,
+  password: environment.databaseConfigs.password,
+  database: environment.databaseConfigs.name,
   entities: ['./src/**/*.entity{.ts,.js}'],
   migrations: ['./src/infra/database/migrations/*{.ts,.js}'],
   autoLoadEntities: true,
