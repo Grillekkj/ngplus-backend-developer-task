@@ -36,6 +36,7 @@ export class AuthService {
   async signIn(
     user: any,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    await this.usersService.update({ id: user.id, lastLogin: new Date() });
     const tokens = await this._generateTokens(user);
     const refreshTokenPayload = this.jwtService.decode(tokens.refreshToken);
     await this._updateRefreshTokenHash(user.id, refreshTokenPayload.jti);
