@@ -129,7 +129,7 @@ export class UsersService {
     });
 
     if (!foundEntry) {
-      throw new NotFoundException(`${data.id} não encontrado.`);
+      throw new NotFoundException(`${data.id} not found.`);
     }
 
     if (req) {
