@@ -11,11 +11,15 @@ import {
 } from '@aws-sdk/client-s3';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
+
+import { AccountType } from 'src/modules/users/enums/account-type.enum';
+import { IRequest } from 'src/modules/auth/interfaces/request.struct';
 
 @Injectable()
 export class FilesService implements OnModuleInit {
@@ -123,8 +127,16 @@ export class FilesService implements OnModuleInit {
 
   async uploadFile(
     file: Express.Multer.File,
-    folder = 'misc',
+    folder?: string,
+    req?: IRequest,
   ): Promise<string> {
+    if (req) {
+      const isAdmin = req.user?.accountType === AccountType.ADMIN;
+      folder = isAdmin ? folder || 'misc' : req.user?.username;
+    } else {
+      folder = folder || 'misc';
+    }
+
     const uniqueSuffix = `${uuidv4()}${path.extname(file.originalname)}`;
     const fileName = `${folder}/${uniqueSuffix}`;
 
@@ -149,7 +161,7 @@ export class FilesService implements OnModuleInit {
     }
   }
 
-  async deleteFile(fileUrl: string): Promise<boolean> {
+  async deleteFile(fileUrl: string, req?: IRequest): Promise<boolean> {
     try {
       const cleanPublicBase = this.publicUrlBase.replace(/\/$/, '');
       const expectedPrefix = `${cleanPublicBase}/${this.bucketName}/`;
@@ -167,6 +179,15 @@ export class FilesService implements OnModuleInit {
       if (!key) {
         this.logger.warn(`Could not extract file key from URL: ${fileUrl}`);
         return false;
+      }
+
+      if (req && req.user?.accountType !== AccountType.ADMIN) {
+        const userFolder = req.user?.username;
+        if (!key.startsWith(`${userFolder}/`)) {
+          throw new ForbiddenException(
+            'You can only delete files in your own folder.',
+          );
+        }
       }
 
       await this.s3.send(
