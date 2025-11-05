@@ -117,18 +117,6 @@ export class AuthController {
       'Validates the provided refresh token by comparing its hash with the one stored in the database. Generates new access and refresh tokens and updates the refresh token hash. All possible errors are included.',
   })
   @ApiBearerAuth('refresh-token')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        refreshToken: {
-          type: 'string',
-          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        },
-      },
-      required: ['refreshToken'],
-    },
-  })
   @ApiResponse({
     status: 200,
     description: 'Returns new access and refresh tokens',
