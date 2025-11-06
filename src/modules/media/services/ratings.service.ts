@@ -4,7 +4,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -57,7 +56,7 @@ export class RatingsService {
     const newRating = this.ratingRepository.create(data);
     const savedRating = await this.ratingRepository.save(newRating);
 
-    await this.incrementUserRatingCount(data.userId);
+    await this.usersService.incrementRatingCount(data.userId);
 
     return savedRating;
   }
@@ -156,40 +155,8 @@ export class RatingsService {
 
     await this.ratingRepository.remove(foundEntry);
 
-    await this.decrementUserRatingCount(foundEntry.userId);
+    await this.usersService.decrementRatingCount(foundEntry.userId);
 
     return foundEntry;
-  }
-
-  private async incrementUserRatingCount(userId: string): Promise<void> {
-    try {
-      const user = await this.usersService.findOne({ id: userId });
-      await this.usersService.update({
-        id: userId,
-        ratingCount: user.ratingCount + 1,
-      });
-    } catch (error) {
-      this.logger.error('Failed to increment ratingCount:', error);
-      throw new InternalServerErrorException(
-        `Failed to increment ratingCount for user ${userId}`,
-      );
-    }
-  }
-
-  private async decrementUserRatingCount(userId: string): Promise<void> {
-    try {
-      const user = await this.usersService.findOne({ id: userId });
-      if (user.ratingCount > 0) {
-        await this.usersService.update({
-          id: userId,
-          ratingCount: user.ratingCount - 1,
-        });
-      }
-    } catch (error) {
-      this.logger.error('Failed to decrement ratingCount:', error);
-      throw new InternalServerErrorException(
-        `Failed to decrement ratingCount for user ${userId}`,
-      );
-    }
   }
 }
