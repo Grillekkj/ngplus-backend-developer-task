@@ -168,7 +168,7 @@ export class RatingsService {
         .execute();
 
       if (result.affected === 0) {
-        throw new BadRequestException('Cannot decrement ratingCount below 0.');
+        throw new BadRequestException('Cannot decrement ratingCount.');
       }
 
       return foundEntry;
