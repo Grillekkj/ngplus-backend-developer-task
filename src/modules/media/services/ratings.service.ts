@@ -4,7 +4,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -23,7 +22,6 @@ import MediaEntity from '../entities/media.entity';
 
 @Injectable()
 export class RatingsService {
-  private readonly logger = new Logger(RatingsService.name);
   constructor(
     @InjectRepository(RatingEntity)
     private readonly ratingRepository: Repository<RatingEntity>,
