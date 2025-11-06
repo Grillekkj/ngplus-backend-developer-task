@@ -76,7 +76,7 @@ export class MediaService {
     return foundEntry;
   }
 
-  async update(data: IUpdateMedia, req: IRequest): Promise<MediaEntity> {
+  async update(data: IUpdateMedia, req?: IRequest): Promise<MediaEntity> {
     const foundEntry = await this.mediaRepository.findOne({
       where: { id: data.id },
     });
@@ -98,7 +98,7 @@ export class MediaService {
     return await this.mediaRepository.save(merged);
   }
 
-  async remove(data: IRemoveMedia, req: IRequest): Promise<MediaEntity> {
+  async remove(data: IRemoveMedia, req?: IRequest): Promise<MediaEntity> {
     const foundEntry = await this.mediaRepository.findOne({
       where: { id: data.id },
     });
