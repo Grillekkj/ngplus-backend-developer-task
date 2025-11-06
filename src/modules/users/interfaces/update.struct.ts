@@ -3,6 +3,7 @@ export interface IUpdate {
   profilePictureUrl?: string;
   username?: string;
   email?: string;
+  passwordHash?: string;
   refreshTokenHash?: string | null;
   ratingCount?: number;
   lastLogin?: Date | null;
