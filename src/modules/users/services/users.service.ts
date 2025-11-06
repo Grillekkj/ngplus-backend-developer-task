@@ -161,23 +161,25 @@ export class UsersService {
   }
 
   async decrementRatingCount(userId: string): Promise<void> {
+    let result;
+
     try {
-      const result = await this.usersRepository
+      result = await this.usersRepository
         .createQueryBuilder()
         .update('users')
         .set({ ratingCount: () => 'rating_count - 1' })
         .where('id = :userId', { userId })
         .andWhere('rating_count > 0')
         .execute();
-
-      if (result.affected === 0) {
-        throw new BadRequestException(
-          `Cannot decrement ratingCount for user ${userId} (already 0 or not found).`,
-        );
-      }
     } catch (error) {
       throw new InternalServerErrorException(
         `Failed to decrement ratingCount for user ${userId}: ${error.message}`,
+      );
+    }
+
+    if (result.affected === 0) {
+      throw new BadRequestException(
+        `Cannot decrement ratingCount for user ${userId} (already 0 or not found).`,
       );
     }
   }
