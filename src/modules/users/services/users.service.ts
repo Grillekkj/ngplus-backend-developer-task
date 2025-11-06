@@ -9,6 +9,7 @@ import {
 
 import { IReturnPaginated } from '../interfaces/returnPaginated.struct';
 import { IRequest } from 'src/modules/auth/interfaces/request.struct';
+import { MailService } from 'src/infra/mail/services/mail.service';
 import { AccountType } from '../enums/account-type.enum';
 import { IFindOne } from '../interfaces/findOne.struct';
 import { IFindAll } from '../interfaces/findAll.struct';
@@ -22,6 +23,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    private readonly mailService: MailService,
   ) {}
 
   async create(data: ICreate): Promise<Partial<UsersEntity>> {
@@ -35,6 +37,12 @@ export class UsersService {
     const savedNewEntry = await this.usersRepository.save(newEntry);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, refreshTokenHash, ...safeUser } = savedNewEntry;
+
+    await this.mailService.sendWelcomeEmail(
+      savedNewEntry.email,
+      savedNewEntry.username,
+    );
+
     return safeUser;
   }
 

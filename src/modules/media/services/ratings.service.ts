@@ -15,6 +15,7 @@ import { IRequest } from 'src/modules/auth/interfaces/request.struct';
 import { ICreateRating } from '../interfaces/ratings-create.struct';
 import { IUpdateRating } from '../interfaces/ratings-update.struct';
 import { IRemoveRating } from '../interfaces/ratings-remove.struct';
+import { MailService } from 'src/infra/mail/services/mail.service';
 import UsersEntity from 'src/modules/users/entities/users.entity';
 import RatingEntity from '../entities/rating.entity';
 import MediaEntity from '../entities/media.entity';
@@ -26,11 +27,13 @@ export class RatingsService {
     private readonly ratingRepository: Repository<RatingEntity>,
     @InjectRepository(MediaEntity)
     private readonly mediaRepository: Repository<MediaEntity>,
+    private readonly mailService: MailService,
   ) {}
 
   async create(data: ICreateRating): Promise<RatingEntity> {
     const media = await this.mediaRepository.findOne({
       where: { id: data.mediaId },
+      relations: ['user'],
     });
 
     if (!media) {
@@ -49,19 +52,29 @@ export class RatingsService {
       throw new BadRequestException('User has already rated this media.');
     }
 
-    return await this.ratingRepository.manager.transaction(async (manager) => {
-      const newRating = manager.create(RatingEntity, data);
-      const savedRating = await manager.save(newRating);
+    const savedRating = await this.ratingRepository.manager.transaction(
+      async (manager) => {
+        const newRating = manager.create(RatingEntity, data);
+        const rating = await manager.save(newRating);
 
-      await manager.increment(
-        UsersEntity,
-        { id: data.userId },
-        'ratingCount',
-        1,
-      );
+        await manager.increment(
+          UsersEntity,
+          { id: data.userId },
+          'ratingCount',
+          1,
+        );
 
-      return savedRating;
-    });
+        return rating;
+      },
+    );
+
+    await this.mailService.sendNewRatingEmail(
+      media.user.email,
+      data.rating,
+      media.user.username,
+    );
+
+    return savedRating;
   }
 
   async findAll(data: IFindAllRatings): Promise<IReturnPaginatedRatings> {

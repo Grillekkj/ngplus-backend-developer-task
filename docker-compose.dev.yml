@@ -52,6 +52,15 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
     command: server /data --console-address ":9001"
 
+    # --- MailHog ---
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: ngplusbackendtest_mailhog
+    restart: on-failure
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
 volumes:
   postgres_data:
   minio_data:
