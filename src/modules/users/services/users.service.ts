@@ -27,6 +27,14 @@ export class UsersService {
   ) {}
 
   async create(data: ICreate): Promise<Partial<UsersEntity>> {
+    const foundEntry = await this.usersRepository.findOne({
+      where: { username: data.username },
+    });
+
+    if (foundEntry) {
+      throw new NotFoundException(`${data.username} already exist.`);
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
 
