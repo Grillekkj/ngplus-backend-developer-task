@@ -38,7 +38,7 @@ export class FilesController {
   @ApiOperation({
     summary: 'Upload a file',
     description:
-      'Uploads a file to the configured S3 bucket. Admins can choose a folder; regular users upload to their own folder. Supports images, videos, and audio files. Max size: 300MB.',
+      'Uploads a file to the configured S3 bucket. Admins can choose a folder; regular users upload to their own folder. Supports images, videos, executables, compressed archives and audio files. Max size: 1GB.',
   })
   @ApiBearerAuth('access-token')
   @ApiBody({
@@ -94,17 +94,34 @@ export class FilesController {
   async uploadFile(
     @UploadedFile(
       new FileValidationPipe({
-        maxByteSize: 300 * 1024 * 1024, // 300MB
+        maxByteSize: 1024 * 1024 * 1024, // 1GB
         allowedMimeTypes: [
+          // Images
           'image/jpeg',
           'image/png',
           'image/jpg',
+
+          // Videos
           'video/mp4',
           'video/mkv',
           'video/avi',
+
+          // Audio
           'audio/mpeg',
           'audio/mp3',
           'audio/wav',
+
+          // Compressed files
+          'application/zip',
+          'application/x-zip-compressed',
+          'application/x-rar-compressed',
+          'application/x-7z-compressed',
+          'application/x-tar',
+          'application/gzip',
+
+          // Executables
+          'application/x-msdownload',
+          'application/octet-stream',
         ],
         required: true,
       }),
