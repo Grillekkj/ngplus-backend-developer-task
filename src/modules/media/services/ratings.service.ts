@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -22,6 +23,7 @@ import MediaEntity from '../entities/media.entity';
 
 @Injectable()
 export class RatingsService {
+  private readonly logger = new Logger(RatingsService.name);
   constructor(
     @InjectRepository(RatingEntity)
     private readonly ratingRepository: Repository<RatingEntity>,
@@ -166,7 +168,7 @@ export class RatingsService {
         ratingCount: user.ratingCount + 1,
       });
     } catch (error) {
-      console.error('Failed to increment ratingCount:', error);
+      this.logger.error('Failed to increment ratingCount:', error);
     }
   }
 
@@ -180,7 +182,7 @@ export class RatingsService {
         });
       }
     } catch (error) {
-      console.error('Failed to decrement ratingCount:', error);
+      this.logger.error('Failed to decrement ratingCount:', error);
     }
   }
 }
