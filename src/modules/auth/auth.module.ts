@@ -4,10 +4,12 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 
+import { JwtPasswordResetStrategy } from './strategies/jwt-password-reset.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthController } from './controllers/auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MailModule } from 'src/infra/mail/mail.module';
 import { AuthService } from './services/auth.service';
 import { UsersModule } from '../users/users.module';
 
@@ -26,8 +28,15 @@ import { UsersModule } from '../users/users.module';
       }),
     }),
     UsersModule,
+    MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, LocalStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    LocalStrategy,
+    JwtPasswordResetStrategy,
+  ],
 })
 export class AuthModule {}
