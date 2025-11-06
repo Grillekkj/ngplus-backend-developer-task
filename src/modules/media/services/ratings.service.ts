@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 
 import { IReturnPaginatedRatings } from '../interfaces/ratings-returnPaginated.struct';
-import { UsersService } from 'src/modules/users/services/users.service';
 import { AccountType } from 'src/modules/users/enums/account-type.enum';
 import { IFindAllRatings } from '../interfaces/ratings-findAll.struct';
 import { IFindOneRating } from '../interfaces/ratings-findOne.struct';
@@ -27,7 +26,6 @@ export class RatingsService {
     private readonly ratingRepository: Repository<RatingEntity>,
     @InjectRepository(MediaEntity)
     private readonly mediaRepository: Repository<MediaEntity>,
-    private readonly usersService: UsersService,
   ) {}
 
   async create(data: ICreateRating): Promise<RatingEntity> {
@@ -51,12 +49,19 @@ export class RatingsService {
       throw new BadRequestException('User has already rated this media.');
     }
 
-    const newRating = this.ratingRepository.create(data);
-    const savedRating = await this.ratingRepository.save(newRating);
+    return await this.ratingRepository.manager.transaction(async (manager) => {
+      const newRating = manager.create(RatingEntity, data);
+      const savedRating = await manager.save(newRating);
 
-    await this.usersService.incrementRatingCount(data.userId);
+      await manager.increment(
+        UsersEntity,
+        { id: data.userId },
+        'ratingCount',
+        1,
+      );
 
-    return savedRating;
+      return savedRating;
+    });
   }
 
   async findAll(data: IFindAllRatings): Promise<IReturnPaginatedRatings> {
@@ -134,27 +139,39 @@ export class RatingsService {
   }
 
   async remove(data: IRemoveRating, req?: IRequest): Promise<RatingEntity> {
-    const foundEntry = await this.ratingRepository.findOne({
-      where: { id: data.id },
-    });
+    return await this.ratingRepository.manager.transaction(async (manager) => {
+      const foundEntry = await manager.findOne(RatingEntity, {
+        where: { id: data.id },
+      });
 
-    if (!foundEntry) {
-      throw new NotFoundException(`Rating ${data.id} not found.`);
-    }
-
-    if (req) {
-      if (
-        req.user?.accountType !== AccountType.ADMIN &&
-        foundEntry.userId !== req.user?.userId
-      ) {
-        throw new ForbiddenException('You can only delete your own rating.');
+      if (!foundEntry) {
+        throw new NotFoundException(`Rating ${data.id} not found.`);
       }
-    }
 
-    await this.ratingRepository.remove(foundEntry);
+      if (req) {
+        if (
+          req.user?.accountType !== AccountType.ADMIN &&
+          foundEntry.userId !== req.user?.userId
+        ) {
+          throw new ForbiddenException('You can only delete your own rating.');
+        }
+      }
 
-    await this.usersService.decrementRatingCount(foundEntry.userId);
+      await manager.remove(foundEntry);
 
-    return foundEntry;
+      const result = await manager
+        .createQueryBuilder()
+        .update(UsersEntity)
+        .set({ ratingCount: () => 'rating_count - 1' })
+        .where('id = :userId', { userId: foundEntry.userId })
+        .andWhere('rating_count > 0')
+        .execute();
+
+      if (result.affected === 0) {
+        throw new BadRequestException('Cannot decrement ratingCount below 0.');
+      }
+
+      return foundEntry;
+    });
   }
 }
