@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 
 import { environment } from './common/configs/environment';
 import { UsersModule } from './modules/users/users.module';
+import { MediaModule } from './modules/media/media.module';
 import { FilesModule } from './infra/files/files.module';
 import { AuthModule } from './modules/auth/auth.module';
 
@@ -29,6 +30,7 @@ const isDocker = process.env.DOCKER === 'true';
     FilesModule,
     AuthModule,
     UsersModule,
+    MediaModule,
   ],
 })
 export class AppModule {}
