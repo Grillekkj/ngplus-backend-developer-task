@@ -2,8 +2,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -146,5 +148,37 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, refreshTokenHash, ...safeUser } = foundEntry;
     return safeUser;
+  }
+
+  async incrementRatingCount(userId: string): Promise<void> {
+    try {
+      await this.usersRepository.increment({ id: userId }, 'ratingCount', 1);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to increment ratingCount for user ${userId}: ${error.message}`,
+      );
+    }
+  }
+
+  async decrementRatingCount(userId: string): Promise<void> {
+    try {
+      const result = await this.usersRepository
+        .createQueryBuilder()
+        .update('users')
+        .set({ ratingCount: () => 'rating_count - 1' })
+        .where('id = :userId', { userId })
+        .andWhere('rating_count > 0')
+        .execute();
+
+      if (result.affected === 0) {
+        throw new BadRequestException(
+          `Cannot decrement ratingCount for user ${userId} (already 0 or not found).`,
+        );
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to decrement ratingCount for user ${userId}: ${error.message}`,
+      );
+    }
   }
 }
