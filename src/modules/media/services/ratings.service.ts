@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -169,6 +170,9 @@ export class RatingsService {
       });
     } catch (error) {
       this.logger.error('Failed to increment ratingCount:', error);
+      throw new InternalServerErrorException(
+        `Failed to increment ratingCount for user ${userId}`,
+      );
     }
   }
 
@@ -183,6 +187,9 @@ export class RatingsService {
       }
     } catch (error) {
       this.logger.error('Failed to decrement ratingCount:', error);
+      throw new InternalServerErrorException(
+        `Failed to decrement ratingCount for user ${userId}`,
+      );
     }
   }
 }
