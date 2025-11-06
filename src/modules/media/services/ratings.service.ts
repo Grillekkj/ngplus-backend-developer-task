@@ -153,9 +153,7 @@ export class RatingsService {
 
     await this.ratingRepository.remove(foundEntry);
 
-    if (req && req.user?.accountType !== AccountType.ADMIN) {
-      await this.decrementUserRatingCount(foundEntry.userId);
-    }
+    await this.decrementUserRatingCount(foundEntry.userId);
 
     return foundEntry;
   }
