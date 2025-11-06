@@ -36,7 +36,10 @@ export default class MediaEntity {
   @Column({ type: 'enum', enum: MediaCategory })
   mediaCategory: MediaCategory;
 
-  @ManyToOne(() => UsersEntity, (user) => user.id, { nullable: false })
+  @ManyToOne(() => UsersEntity, (user) => user.id, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: UsersEntity;
   @Column({ type: 'uuid' })
