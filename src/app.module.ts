@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { MediaModule } from './modules/media/media.module';
 import { FilesModule } from './infra/files/files.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MailModule } from './infra/mail/mail.module';
 
 const isDocker = process.env.DOCKER === 'true';
 @Module({
@@ -31,6 +32,7 @@ const isDocker = process.env.DOCKER === 'true';
     AuthModule,
     UsersModule,
     MediaModule,
+    MailModule,
   ],
 })
 export class AppModule {}
