@@ -52,25 +52,29 @@ export class RatingsService {
       throw new BadRequestException('User has already rated this media.');
     }
 
-    return await this.ratingRepository.manager.transaction(async (manager) => {
-      const newRating = manager.create(RatingEntity, data);
-      const savedRating = await manager.save(newRating);
+    const savedRating = await this.ratingRepository.manager.transaction(
+      async (manager) => {
+        const newRating = manager.create(RatingEntity, data);
+        const rating = await manager.save(newRating);
 
-      await manager.increment(
-        UsersEntity,
-        { id: data.userId },
-        'ratingCount',
-        1,
-      );
+        await manager.increment(
+          UsersEntity,
+          { id: data.userId },
+          'ratingCount',
+          1,
+        );
 
-      await this.mailService.sendNewRatingEmail(
-        media.user.email,
-        data.rating,
-        media.user.username,
-      );
+        return rating;
+      },
+    );
 
-      return savedRating;
-    });
+    await this.mailService.sendNewRatingEmail(
+      media.user.email,
+      data.rating,
+      media.user.username,
+    );
+
+    return savedRating;
   }
 
   async findAll(data: IFindAllRatings): Promise<IReturnPaginatedRatings> {
