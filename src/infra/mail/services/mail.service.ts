@@ -35,4 +35,41 @@ export class MailService {
       );
     }
   }
+
+  async sendPasswordResetEmail(to: string, username: string, token: string) {
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject: 'Password Reset',
+        template: 'password-reset',
+        context: {
+          username,
+          token,
+        },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to ${to}`,
+        error.stack,
+      );
+    }
+  }
+
+  async sendPasswordResetSuccessEmail(to: string, username: string) {
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject: 'Your password has been changed',
+        template: 'password-reset-success',
+        context: {
+          username,
+        },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset success email to ${to}`,
+        error.stack,
+      );
+    }
+  }
 }
