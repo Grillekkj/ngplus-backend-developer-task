@@ -26,7 +26,7 @@ The project is fully containerized using Docker and includes services for a Post
 * **File Storage:** [MinIO](https://min.io/) (S3-Compatible)
 * **API Documentation:** [Swagger (OpenAPI)](https://swagger.io/)
 * **Email:** [Nodemailer](https://nodemailer.com/) + [MailHog](https://github.com/mailhog/MailHog) (for development)
-* **Containerization:** [Docker](https://www.docker.com/) & Docker Compose
+* **Containerization:** [Docker](https://www.docker.com/products/docker-desktop/) & Docker Compose
 
 ## AI Usage / Fair Use
 
@@ -36,6 +36,12 @@ This project used AI tools responsibly to assist development, since it is a solo
 * **Fake Data Generation:** AI helped generate sample/fake data for testing purposes.
 * **Swagger Tags Generation:** AI assisted in generating Swagger tags, all reviewed and validated manually.
 * **Note:** All AI contributions were supervised and verified to ensure correctness and security.
+
+## Pitch Presentation
+
+Here’s the pitch presentation and the link:
+
+[View the Pitch Presentation](https://pitch.com/v/ngplus-backend-test-63kmqt/6fb3c310-b1f5-4274-8151-bbd81362fdaf)
 
 ## Prerequisites
 
