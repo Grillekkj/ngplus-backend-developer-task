@@ -1,98 +1,200 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NGPlus API Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository contains the backend service for the NGPlus Developer Task. It is a robust API built with NestJS, TypeScript, and TypeORM, designed to manage users, media, ratings, and files.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The project is fully containerized using Docker and includes services for a PostgreSQL database, MinIO for S3-compatible file storage, and MailHog for email testing.
 
-## Description
+> **Disclaimer:** All data in this repository is fake and intended for testing purposes only. Do not use it in production or with real personal information.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+* **Authentication:** Full JWT-based authentication (access, refresh, and password-reset tokens) using Passport.js. Includes registration, login, logout, and "forgot password" email flow.
+* **Role-Based Access Control (RBAC):** Differentiates between `USER` and `ADMIN` roles, with protected routes for admin-only functionalities.
+* **User Management:** Standard CRUD operations for users. Admins can manage all user accounts.
+* **Media & Ratings:** Complete CRUD for media items (categorized as `game`, `video`, `music`, `artwork`). Users can rate media they do not own, and new ratings trigger email notifications.
+* **File Storage (S3):** Secure file upload handling integrated with an S3-compatible service (MinIO for development). Users upload to their own sandboxed "folder" by default, while admins can specify a folder.
+* **Admin Reporting:** Admin-only endpoints to generate comprehensive reports ([PDF](./ngplus_report.pdf) and [Excel](./ngplus_report.xlsx)) detailing all users, media, and ratings in the system.
+* **Email Notifications:** Asynchronous email service using Nodemailer and Handlebars templates for welcome emails, password resets, and new rating alerts.
+* **Database Management:** Uses TypeORM with PostgreSQL, including a full migration and seeding system to quickly set up the database with sample data.
 
-```bash
-$ npm install
+## Tech Stack
+
+* **Framework:** [NestJS](https://nestjs.com/)
+* **Language:** [TypeScript](https://www.typescriptlang.org/)
+* **Database:** [PostgreSQL](https://www.postgresql.org/) + [TypeORM](https://typeorm.io/)
+* **Authentication:** [Passport.js](http://www.passportjs.org/) (JWT & Local Strategies)
+* **File Storage:** [MinIO](https://min.io/) (S3-Compatible)
+* **API Documentation:** [Swagger (OpenAPI)](https://swagger.io/)
+* **Email:** [Nodemailer](https://nodemailer.com/) + [MailHog](https://github.com/mailhog/MailHog) (for development)
+* **Containerization:** [Docker](https://www.docker.com/products/docker-desktop/) & Docker Compose
+
+## AI Usage / Fair Use
+
+This project used AI tools responsibly to assist development, since it is a solo project:
+
+* **Code Review & Pull Requests:** GitHub Copilot was used to suggest improvements and review code automatically. Its contributions can be verified in the pull request history and in the comments it generated.
+* **Fake Data Generation:** AI helped generate sample/fake data for testing purposes.
+* **Swagger Tags Generation:** AI assisted in generating Swagger tags, all reviewed and validated manually.
+* **Note:** All AI contributions were supervised and verified to ensure correctness and security.
+
+## Pitch Presentation
+
+Here’s the pitch presentation and the link:
+
+[View the Pitch Presentation](https://pitch.com/v/ngplus-backend-test-63kmqt/6fb3c310-b1f5-4274-8151-bbd81362fdaf)
+
+## Prerequisites
+
+* Docker
+* Docker Compose
+
+## Getting Started
+
+### 1. Configure Environment
+
+Create a `.env` file in the project root. You can copy the example file:
+
+```
+cp .env.example .env
 ```
 
-## Compile and run the project
+Review the `.env` file and change the default passwords and secrets, especially for `JWT_` keys. The default settings are configured to work with the provided Docker Compose setup.
 
-```bash
-# development
-$ npm run start
+### 2. Run with Docker Compose
 
-# watch mode
-$ npm run start:dev
+This is the recommended way to run the project for development. This command will build the images and start all necessary services (app, postgres_db, minio, mailhog).
 
-# production mode
-$ npm run start:prod
+```
+docker-compose -f docker-compose.dev.yml up --build -d
 ```
 
-## Run tests
+The `docker-entrypoint.sh` script will automatically:
 
-```bash
-# unit tests
-$ npm run test
+* Wait for the PostgreSQL database to be ready.
+* Run all pending TypeORM migrations.
+* Run all database seeds to populate the database with sample data.
+* Start the NestJS application in development (watch) mode.
 
-# e2e tests
-$ npm run test:e2e
+### Services
 
-# test coverage
-$ npm run test:cov
+Once running, the following services will be available:
+
+* NestJS API: http://localhost:3000 (or your `SERVER_PORT` from `.env`)
+* API Docs (Swagger): http://localhost:3000/api
+* MinIO (S3) Console: http://localhost:9001 (Login with `S3_ACCESS_KEY` and `S3_SECRET_KEY` from your `.env`)
+* MailHog (Email UI): http://localhost:8025
+* PostgreSQL: localhost:5433 (for external DB clients)
+* Admin Reports: `http://localhost:3000/reports/pdf` and `http://localhost:3000/reports/excel` (Admin token required)
+
+### Database (Migrations & Seeding)
+
+The project uses TypeORM for database management. Scripts are available in `package.json`.
+
+**Run Migrations:** (This runs automatically on Docker startup)
+
+```
+npm run migration:run
 ```
 
-## Deployment
+**Run Seeds:** (This runs automatically on Docker startup)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```
+npm run seed:run
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Generate a New Migration:**
 
-## Resources
+```
+# Make your changes in the .entity.ts files
+npm run migration:generate <YourMigrationName>
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+**Generate a New Seed:**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```
+# Make your changes inside the generated file
+npm run seed:create <YourSeedName>
+```
 
-## Support
+**Revert a Migration:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+npm run migration:revert
+```
 
-## Stay in touch
+## API Documentation
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Swagger
 
-## License
+With the application running, you can access the interactive Swagger API documentation at:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+http://localhost:3000/api
+
+### Postman
+
+A Postman collection ([Ngplus API.postman_collection.json](./Ngplus%20API.postman_collection.json)) is included in the root of this project for easy testing of all endpoints.
+> **Note:** All IDs and settings are pre-filled, so the collection works out of the box. The only required step is to provide the **Bearer Token** obtained from the `auth/login` endpoint. You only need to change other fields if you want to test different operations.
+
+## Environment Variables
+
+The `.env` file is structured as follows:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| DATABASE_TYPE | TypeORM database type. | postgres |
+| DATABASE_HOST | Database host. | 127.0.0.1 |
+| DATABASE_PORT | Database port. | 5433 |
+| DATABASE_USER | Database username. | postgres |
+| DATABASE_PASSWORD | Database password. | examplePass |
+| DATABASE_DB | Database name. | exampleDb |
+| S3_ENDPOINT | S3 service endpoint. | localhost |
+| S3_PORT | S3 service port. | 9000 |
+| S3_ACCESS_KEY | S3 access key. | exampleLogin |
+| S3_SECRET_KEY | S3 secret key. | examplePass |
+| S3_BUCKET_NAME | S3 bucket name. | example-media |
+| S3_USE_SSL | Use SSL for S3. | false |
+| S3_PUBLIC_URL | Public base URL for S3 files. | http://localhost:9000 |
+| JWT_ACCESS_TOKEN_SECRET | Secret for access tokens. | Example1 |
+| JWT_ACCESS_TOKEN_EXPIRATION | Expiration time for access tokens. | 15m |
+| JWT_REFRESH_TOKEN_SECRET | Secret for refresh tokens. | Example2 |
+| JWT_REFRESH_TOKEN_EXPIRATION | Expiration time for refresh tokens. | 7d |
+| JWT_PASSWORD_RESET_SECRET | Secret for password reset tokens. | Example3 |
+| JWT_PASSWORD_RESET_EXPIRATION | Expiration time for password reset. | 15m |
+| MAIL_HOST | SMTP host. | mailhog |
+| MAIL_PORT | SMTP port. | 1025 |
+| MAIL_USER | SMTP username. | mailhog |
+| MAIL_PASS | SMTP password. | 123456789 |
+| MAIL_FROM | Default "from" email address. | noreply@example.com |
+| SERVER_PORT | Port for the NestJS API. | 3000 |
+| DOCKER | Set to true inside Docker. | false |
+
+## Project Board
+
+### Known Bugs
+
+| Issue | Notes |
+|-------|-------|
+| PostgreSQL fails locally | Only works with Docker unless `.env` port is updated. Needs multi-env support. |
+| Race condition on decrement | Breaks if multiple requests are made simultaneously. |
+| File uploader restrictions | Breaks with `.exe` and compressed files for games; should accept `.txt`, `.pdf`, `.docx` for text media. |
+
+### Next Steps / Improvements
+
+| Task | Notes |
+|------|-------|
+| Make a frontend | Build a UI for the API. |
+| Add types | Define types for every const/return/etc. |
+| Add Jest tests | Cover main features with unit tests. |
+| Add observability | Grafana + more logs. |
+| Performance tests | Spike/load testing. |
+| Add IA MD file | Define code standards to auto-format code. |
+| Change Swagger UI styles | Make it look better. |
+| Reverify security measures | Audit current security. |
+| Auto-delete media from bucket | When media is deleted from DB. |
+| Add email queue | Send emails asynchronously instead of instantly. |
+| Change recover password email | Use reset link instead of token in production. |
+| Fix “not found” errors in prod | Avoid leaking info in recovery endpoint. |
+| Add second upload endpoint | For user profile pictures. |
+| Add verification to usernames | Validate allowed characters. |
+| Separate upload/delete endpoints | Easier testing on dev; prod auto-upload on create media endpoint. |
+
