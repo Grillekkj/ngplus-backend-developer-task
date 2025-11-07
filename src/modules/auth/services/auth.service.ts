@@ -7,6 +7,7 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 
 import { UsersService } from 'src/modules/users/services/users.service';
@@ -71,6 +72,15 @@ export class AuthService {
 
     if (!foundEntry) {
       throw new NotFoundException('Entry not found.');
+    }
+
+    const isPasswordMatching = await bcrypt.compare(
+      newPassword,
+      foundEntry.passwordHash,
+    );
+
+    if (isPasswordMatching) {
+      throw new BadRequestException('You cannot reuse the same password');
     }
 
     const salt = await bcrypt.genSalt(10);
