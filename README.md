@@ -28,6 +28,15 @@ The project is fully containerized using Docker and includes services for a Post
 * **Email:** [Nodemailer](https://nodemailer.com/) + [MailHog](https://github.com/mailhog/MailHog) (for development)
 * **Containerization:** [Docker](https://www.docker.com/) & Docker Compose
 
+## AI Usage / Fair Use
+
+This project used AI tools responsibly to assist development, since it is a solo project:
+
+* **Code Review & Pull Requests:** GitHub Copilot was used to suggest improvements and review code automatically. Its contributions can be verified in the pull request history and in the comments it generated.
+* **Fake Data Generation:** AI helped generate sample/fake data for testing purposes.
+* **Swagger Tags Generation:** AI assisted in generating Swagger tags, all reviewed and validated manually.
+* **Note:** All AI contributions were supervised and verified to ensure correctness and security.
+
 ## Prerequisites
 
 * Docker
@@ -152,3 +161,34 @@ The `.env` file is structured as follows:
 | MAIL_FROM | Default "from" email address. | noreply@example.com |
 | SERVER_PORT | Port for the NestJS API. | 3000 |
 | DOCKER | Set to true inside Docker. | false |
+
+## Project Board
+
+### Known Bugs
+
+| Issue | Notes |
+|-------|-------|
+| PostgreSQL fails locally | Only works with Docker unless `.env` port is updated. Needs multi-env support. |
+| Race condition on decrement | Breaks if multiple requests are made simultaneously. |
+| File uploader restrictions | Breaks with `.exe` and compressed files for games; should accept `.txt`, `.pdf`, `.docx` for text media. |
+
+### Next Steps / Improvements
+
+| Task | Notes |
+|------|-------|
+| Make a frontend | Build a UI for the API. |
+| Add types | Define types for every const/return/etc. |
+| Add Jest tests | Cover main features with unit tests. |
+| Add observability | Grafana + more logs. |
+| Performance tests | Spike/load testing. |
+| Add IA MD file | Define code standards to auto-format code. |
+| Change Swagger UI styles | Make it look better. |
+| Reverify security measures | Audit current security. |
+| Auto-delete media from bucket | When media is deleted from DB. |
+| Add email queue | Send emails asynchronously instead of instantly. |
+| Change recover password email | Use reset link instead of token in production. |
+| Fix “not found” errors in prod | Avoid leaking info in recovery endpoint. |
+| Add second upload endpoint | For user profile pictures. |
+| Add verification to usernames | Validate allowed characters. |
+| Separate upload/delete endpoints | Easier testing on dev; prod auto-upload on create media endpoint. |
+
