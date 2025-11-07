@@ -39,9 +39,10 @@ This project used AI tools responsibly to assist development, since it is a solo
 
 ## Pitch Presentation
 
-Here’s the pitch presentation and the link:
+Here’s the pitch and the presentation link:
 
-[View the Pitch Presentation](https://pitch.com/v/ngplus-backend-test-63kmqt/6fb3c310-b1f5-4274-8151-bbd81362fdaf)
+[View the Presentation](https://www.youtube.com/watch?v=upeTFV3EXt8)
+[View the Pitch](https://pitch.com/v/ngplus-backend-test-63kmqt/6fb3c310-b1f5-4274-8151-bbd81362fdaf)
 
 ## Prerequisites
 
