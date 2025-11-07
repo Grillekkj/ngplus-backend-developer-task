@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 import { Module } from '@nestjs/common';
 
+import { ReportsModule } from './modules/reports/reports.module';
 import { environment } from './common/configs/environment';
 import { UsersModule } from './modules/users/users.module';
 import { MediaModule } from './modules/media/media.module';
@@ -33,6 +34,7 @@ const isDocker = process.env.DOCKER === 'true';
     UsersModule,
     MediaModule,
     MailModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}
