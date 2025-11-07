@@ -175,9 +175,9 @@ export class RatingsService {
       const result = await manager
         .createQueryBuilder()
         .update(UsersEntity)
-        .set({ ratingCount: () => 'rating_count - 1' })
+        .set({ ratingCount: () => 'ratingCount - 1' })
         .where('id = :userId', { userId: foundEntry.userId })
-        .andWhere('rating_count > 0')
+        .andWhere('ratingCount > 0')
         .execute();
 
       if (result.affected === 0) {
