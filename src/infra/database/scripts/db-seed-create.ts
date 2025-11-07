@@ -1,19 +1,17 @@
 import * as path from 'node:path';
 import { format } from 'date-fns';
-import * as yargs from 'yargs';
 import * as fs from 'node:fs';
 
 import { toKebabCase, toPascalCase } from 'src/utils/to-case';
 
 async function create() {
-  const argv = await yargs.option('name', {
-    alias: 'n',
-    description: 'Seed name',
-    type: 'string',
-    demandOption: true,
-  }).argv;
+  const seedName = process.argv.at(-1);
 
-  const seedName = argv.name;
+  if (!seedName || seedName.endsWith('.ts')) {
+    console.error('Error: seed name is required.');
+    console.log('Example usage: npm run seed:create users-data');
+    process.exit(1);
+  }
 
   const timestamp = format(new Date(), 'yyyyMMddHHmmss');
   const fileNameKebabCase = `${timestamp}-${toKebabCase(seedName)}.ts`;
@@ -34,6 +32,7 @@ export const ${fileNamePascalCase}Seed = {
   }
 };
 `;
+
   fs.writeFileSync(filePath, seedContent);
   console.log(`Seed file created: ${fileNameKebabCase}`);
 }
