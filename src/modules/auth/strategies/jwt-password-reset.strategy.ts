@@ -15,7 +15,6 @@ export class JwtPasswordResetStrategy extends PassportStrategy(
       secretOrKey: configService.get<string>(
         'JWT_PASSWORD_RESET_SECRET',
       ) as string,
-      passReqToCallback: true,
     });
   }
 
